@@ -19,10 +19,10 @@ TIMEOUT = 60
 
 mysql_cnf_data = """\
 [client]
-host = {MYSQL_PORT_3306_TCP_ADDR}
-port = {MYSQL_PORT_3306_TCP_PORT}
-user = {MYSQL_ENV_MYSQL_USER}
-password = {MYSQL_ENV_MYSQL_PASSWORD}
+host = mysql
+port = 3306
+user = {MYSQL_USER}
+password = {MYSQL_PASSWORD}
 """.format(**os.environ)
 
 t0 = time.monotonic()
@@ -33,7 +33,7 @@ with tempfile.NamedTemporaryFile('w+') as tf:
 
     while time.monotonic() - t0 < TIMEOUT:
         proc = subprocess.Popen(['mysql', '--defaults-file=' + tf.name,
-                                 os.environ['MYSQL_ENV_MYSQL_DATABASE']],
+                                 os.environ['MYSQL_DATABASE']],
                                 stdin=subprocess.PIPE,
                                 universal_newlines=True)
         try:

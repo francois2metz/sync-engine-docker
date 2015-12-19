@@ -1,76 +1,47 @@
-###############
-# inbox/inbox #
-###############
+FROM ubuntu:precise
 
-FROM debian:wheezy
-
-MAINTAINER inboxapp
 RUN apt-get -q update && \
     DEBIAN_FRONTEND=noninteractive apt-get -qy install \
-        anacron \
-        build-essential \
-        cron \
-        curl \
-        g++ \
-        gcc \
         git \
-        lib32z1-dev \
-        libffi-dev \
-        libmysqlclient-dev \
-        libxml2-dev \
-        libxslt-dev \
-        libzmq-dev \
-        mysql-client \
-        net-tools \
-        procps \
+        mercurial \
+        wget \
         python \
         python-dev \
-        python-lxml \
         python-pip \
         python-setuptools \
-        python-software-properties\
-        runit \
-        sudo \
-        supervisor \
-        tnef \
-        wget \
-    && \
-    pip install 'setuptools>=5.3' subprocess32 tox
+        build-essential \
+        libmysqlclient-dev \
+        gcc \
+        g++ \
+        libzmq-dev \
+        libxml2-dev \
+        libxslt-dev \
+        lib32z1-dev \
+        libffi-dev \
+        pkg-config \
+        python-lxml \
+        tmux \
+        curl \
+        tnef
+
+RUN pip install 'pip>=1.5.6' 'setuptools>=5.3'
 
 RUN useradd -ms /bin/sh admin && \
     install -d -m0775 -o root -g admin /srv/inbox
+
 WORKDIR /srv/inbox
 
-ADD requirements.txt /srv/inbox/requirements.txt
-RUN pip install -r /srv/inbox/requirements.txt
+RUN git clone https://github.com/nylas/sync-engine.git /srv/inbox
+RUN pip install -r requirements.txt
+RUN pip install -e .
 
-# XXX: This is to work around some problem with installing the deps from tox.ini
-RUN pip install \
-        pytest \
-        pytest-flask \
-        pytest-instafail \
-        pytest-timeout \
-        pytest-xdist \
-        requests
+COPY docker/ /srv/
+COPY config.json /srv/inbox/config.json
+COPY secrets.yml /srv/inbox/secrets.yml
 
-RUN install -d -m0775 -o root -g admin /etc/inboxapp && \
-    install -d -m0775 -o root -g admin /etc/mysql/conf.d && \
-    install -d -m0775 -o root -g admin /run/inboxapp && \
-    install -d -m0775 -o root -g admin /run/supervisor && \
-    ln -s /srv/inbox/docker /srv/docker && \
-    chown -R admin /usr/local/lib/python2.7
+ENV INBOX_CFG_PATH /srv/inbox/config.json:/srv/inbox/secrets.yml
 
-#@DYNAMIC base
-ADD . /srv/inbox
-RUN /srv/inbox/docker/postinstall-src /srv/inbox && \
-    install -m0755 docker/inbox-cron-hourly /etc/cron.hourly/inbox-cron-hourly && \
-    install -m0755 docker/inbox-cron-daily /etc/cron.daily/inbox-cron-daily && \
-    install -m0755 docker/inbox-cron-weekly /etc/cron.weekly/inbox-cron-weekly && \
-    install -m0755 docker/inbox-cron-monthly /etc/cron.monthly/inbox-cron-monthly
-
-ENTRYPOINT ["/srv/docker/entrypoint"]
-ENV INBOX_CFG_PATH /etc/inboxapp/secrets.yml:/etc/inboxapp/config.json:/run/inboxapp/secrets.yml:/run/inboxapp/config.json
 EXPOSE 5555
+USER admin
 
-# Permissions for some of these are set in docker/entrypoint.
-VOLUME ["/etc/inboxapp", "/var/lib/inboxapp", "/var/log/inboxapp", "/var/log/supervisor"]
+VOLUME "/var/lib/inboxapp"
