@@ -35,7 +35,6 @@ RUN git clone https://github.com/nylas/sync-engine.git /srv/inbox
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
-COPY docker/ /srv/
 COPY config.json /srv/inbox/config.json
 COPY secrets.yml /srv/inbox/secrets.yml
 
