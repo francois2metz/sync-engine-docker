@@ -8,6 +8,8 @@ api:
     - "127.0.0.1:5555:5555"
   env_file:
     - env_sync
+  volumes_from:
+    - sync
 
 sync:
   build: .
