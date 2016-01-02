@@ -8,28 +8,6 @@
                 "ID": 0,
                 "SCHEMA_NAME": "inbox",
                 "OPEN": true
-            },
-            {
-                "ID": 1,
-                "SCHEMA_NAME": "inbox_1",
-                "OPEN": true
-            }
-        ]
-    },
-    {
-        "HOSTNAME": "mysql",
-        "PORT": 3306,
-        "SHARDS": [
-            {
-                "ID": 2,
-                "SCHEMA_NAME": "inbox_2",
-                "OPEN": true
-            },
-            {
-                "ID": 3,
-                "SCHEMA_NAME": "inbox_3",
-                "OPEN": true,
-                "DISABLED": true
             }
         ]
     }
