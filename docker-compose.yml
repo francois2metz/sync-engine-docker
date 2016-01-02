@@ -1,6 +1,6 @@
 api:
   build: .
-  command: bin/inbox-api
+  command: bin/inbox-api --prod
   links:
     - mysql
     - redis
@@ -13,7 +13,7 @@ api:
 
 sync:
   build: .
-  command: bin/inbox-start
+  command: bin/inbox-start --prod
   links:
     - mysql
     - redis
